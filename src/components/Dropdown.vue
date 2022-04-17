@@ -1,16 +1,17 @@
 <template>
   <div class="dropdown" ref="dropdownRef">
-    <a href="#" class="btn btn-outline-light my-2 dropdown-toggle" @click.prevent="toggleOpen">
+    <button class="btn btn-outline-light my-2 dropdown-toggle">
       {{ title }}
-    </a>
-    <ul class="dropdown-menu" :style="{ display: 'block' }" v-if="isOpen">
+    </button>
+    <ul class="dropdown-menu" :style="{ display: 'block' }" v-if="isClickOutSide">
       <slot></slot>
     </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue'
+import { useClickOutSide } from '@/hooks/useClickOutSide'
+import { defineComponent, ref, watch } from 'vue'
 export default defineComponent({
   name: 'Dropdown',
   props: {
@@ -20,26 +21,24 @@ export default defineComponent({
     }
   },
   setup () {
-    const isOpen = ref(false)
-    const dropdownRef = ref<HTMLElement | null>(null)
-    const toggleOpen = () => {
-      isOpen.value = !isOpen.value
-    }
-    const dropdownHandler = (e: MouseEvent) => {
-      // e.target as HTMLElement 类型断言防止报错
-      if (!dropdownRef.value?.contains(e.target as HTMLElement) && isOpen.value) {
-        isOpen.value = false
-      }
-    }
-    onMounted(() => {
-      document.addEventListener('click', dropdownHandler)
-    })
-    onUnmounted(() => {
-      document.removeEventListener('click', dropdownHandler)
-    })
+    // const isOpen = ref(false)
+    const dropdownRef = ref<null | HTMLElement>(null)
+    // const toggleOpen = () => {
+    //   isOpen.value = !isOpen.value
+    // }
+
+    const isClickOutSide = useClickOutSide(dropdownRef)
+    // watch(isClickOutSide, () => {
+    //   console.log(666, isOpen.value, isClickOutSide)
+
+    //   // setup函数只执行一次,如果需要多次执行需监听isClickOutSide
+    //   if (isOpen.value && isClickOutSide) {
+    //     isOpen.value = false
+    //   }
+    // })
     return {
-      isOpen,
-      toggleOpen,
+      isClickOutSide,
+      // toggleOpen,
       dropdownRef // 返回的变量名与绑定的ref名称一致
     }
   }
