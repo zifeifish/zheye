@@ -5,10 +5,10 @@ export const useClickOutSide = (elementRef: Ref<HTMLElement | null>) => {
   const dropdownHandler = (e: MouseEvent) => {
     if (elementRef.value) {
       // e.target as HTMLElement 类型断言防止报错
-      if (!elementRef.value?.contains(e.target as HTMLElement) && isClickOutSide.value) {
-        isClickOutSide.value = false
+      if (elementRef.value?.contains(e.target as HTMLElement)) {
+        isClickOutSide.value = !isClickOutSide.value
       } else {
-        isClickOutSide.value = true
+        isClickOutSide.value = false
       }
     }
   }
