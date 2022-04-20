@@ -29,8 +29,13 @@ import { defineComponent, reactive, ref, onUnmounted } from 'vue'
 import ValidtateInput, { RulesProp } from './ValidtateInput.vue'
 import ValidateForm from './ValidateForm.vue'
 import mitt from 'mitt'
-// 创建一个实例化的mitt
-export const InputEmitter = mitt()
+
+// mitt3.0.0 定义一个events 类型, 这个定义是为了让事件与callback对应
+type Events = {
+  'form-item-created': string
+}
+// 创建一个实例化的mitt 将event作为泛型传入
+export const InputEmitter = mitt<Events>()
 export default defineComponent({
   name: 'SimplyForm',
   components: {
@@ -57,7 +62,8 @@ export default defineComponent({
       console.log('result', test)
     }
     // 添加监听
-    InputEmitter.on('form-item-created', test => console.log('off mitt', test))
+    // InputEmitter.on('form-item-created', test => console.log('off mitt', test))
+    InputEmitter.on('form-item-created', callback)
 
     onUnmounted(() => {
       // 删除监听
