@@ -13,7 +13,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, PropType } from 'vue'
+import { defineComponent, reactive, PropType, onMounted } from 'vue'
+import { InputEmitter } from './SimplyForm.vue'
 const emailReg = new RegExp(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
 interface RuleProp {
   type: 'required' | 'email';
@@ -60,8 +61,15 @@ export default defineComponent({
           return passed
         })
         inputRef.error = !allPassed
+        return allPassed
       }
+      return true
     }
+
+    onMounted(() => {
+      // 把事件发射出去
+      InputEmitter.emit('form-item-created', inputRef.val)
+    })
     return {
       inputRef,
       validateInput,

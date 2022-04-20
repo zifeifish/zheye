@@ -3,6 +3,7 @@
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">邮箱地址</label>
       <validtate-input
+        ref="inputRef"
         placeholder="请输入邮箱地址"
         type="text"
         :rules="emailRules"
@@ -24,10 +25,12 @@
   </validate-form>
 </template>
 <script lang="ts">
-import { defineComponent, reactive, ref } from 'vue'
+import { defineComponent, reactive, ref, onUnmounted } from 'vue'
 import ValidtateInput, { RulesProp } from './ValidtateInput.vue'
 import ValidateForm from './ValidateForm.vue'
-
+import mitt from 'mitt'
+// 创建一个实例化的mitt
+export const InputEmitter = mitt()
 export default defineComponent({
   name: 'SimplyForm',
   components: {
@@ -42,16 +45,31 @@ export default defineComponent({
     const passwordRules = reactive<RulesProp>([
       { type: 'required', message: '密码不能为空' }
     ])
-    const emailVal = ref('')
+    const emailVal = ref('123@test.com')
+    const inputRef = ref<any>()
+
     const onFormSubmit = (valid: boolean) => {
       console.log(666, valid)
+      console.log(777, inputRef.value.validateInput())
     }
+    // 监听回调
+    const callback = (test: string) => {
+      console.log('result', test)
+    }
+    // 添加监听
+    InputEmitter.on('form-item-created', test => console.log('off mitt', test))
+
+    onUnmounted(() => {
+      // 删除监听
+      InputEmitter.off('form-item-created', test => console.log('off mitt', test))
+    })
 
     return {
       emailRules,
       passwordRules,
       emailVal,
-      onFormSubmit
+      onFormSubmit,
+      inputRef
     }
   }
 })
