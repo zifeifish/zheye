@@ -1,5 +1,5 @@
 <template>
-  <form action="">
+  <validate-form @form-submit="onFormSubmit($event)">
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">邮箱地址</label>
       <validtate-input
@@ -18,16 +18,21 @@
         :rules="passwordRules"
       ></validtate-input>
     </div>
-  </form>
+    <template #submit>
+      <button class="btn btn-warning">具名插槽的按钮</button>
+    </template>
+  </validate-form>
 </template>
 <script lang="ts">
 import { defineComponent, reactive, ref } from 'vue'
 import ValidtateInput, { RulesProp } from './ValidtateInput.vue'
+import ValidateForm from './ValidateForm.vue'
 
 export default defineComponent({
   name: 'SimplyForm',
   components: {
-    ValidtateInput
+    ValidtateInput,
+    ValidateForm
   },
   setup () {
     const emailRules = reactive<RulesProp>([
@@ -37,12 +42,16 @@ export default defineComponent({
     const passwordRules = reactive<RulesProp>([
       { type: 'required', message: '密码不能为空' }
     ])
-    const emailVal = ref('哈哈哈')
+    const emailVal = ref('')
+    const onFormSubmit = (valid: boolean) => {
+      console.log(666, valid)
+    }
 
     return {
       emailRules,
       passwordRules,
-      emailVal
+      emailVal,
+      onFormSubmit
     }
   }
 })
