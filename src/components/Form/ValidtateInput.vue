@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, PropType, onMounted } from 'vue'
-import { InputEmitter } from './SimplyForm.vue'
+import { InputEmitter } from './ValidateForm.vue'
 const emailReg = new RegExp(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
 interface RuleProp {
   type: 'required' | 'email';
@@ -68,7 +68,7 @@ export default defineComponent({
 
     onMounted(() => {
       // 把事件发射出去
-      InputEmitter.emit('form-item-created', inputRef.val)
+      InputEmitter.emit('form-item-created', validateInput)
     })
     return {
       inputRef,
