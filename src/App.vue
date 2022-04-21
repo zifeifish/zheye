@@ -4,7 +4,19 @@
     <!-- <simply-form></simply-form> -->
     <!-- <column-List :list="list"></column-List> -->
     <!-- <Home></Home> -->
-    <login></login>
+    <!-- <login></login> -->
+    <router-view></router-view>
+    <footer class="text-center py-4 text-secondary bg-light mt-6">
+      <small>
+        <ul class="list-inline mb-0">
+          <li class="list-inline-item">© 2020 者也专栏</li>
+          <li class="list-inline-item">课程</li>
+          <li class="list-inline-item">文档</li>
+          <li class="list-inline-item">联系</li>
+          <li class="list-inline-item">更多</li>
+        </ul>
+      </small>
+    </footer>
   </div>
 </template>
 
@@ -57,7 +69,7 @@ import Login from './views/Login/Login.vue'
 // ]
 
 const userInfo: UserProps = {
-  isLogin: true,
+  isLogin: false,
   name: 'hcy'
 }
 
@@ -65,10 +77,10 @@ export default defineComponent({
   name: 'App',
   components: {
     // ColumnList,
-    GlobalHeader,
+    GlobalHeader
     // SimplyForm,
     // Home,
-    Login
+    // Login
   },
   setup () {
     return {
