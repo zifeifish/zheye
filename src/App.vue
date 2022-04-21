@@ -1,8 +1,10 @@
 <template>
   <div class="container">
     <global-header :user="user"></global-header>
-    <simply-form></simply-form>
+    <!-- <simply-form></simply-form> -->
     <!-- <column-List :list="list"></column-List> -->
+    <!-- <Home></Home> -->
+    <login></login>
   </div>
 </template>
 
@@ -11,7 +13,9 @@ import { defineComponent } from 'vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 // import ColumnList, { ColumnProps } from './components/ColumnList.vue'
 import GlobalHeader, { UserProps } from './components/GlobalHeader.vue'
-import SimplyForm from './components/Form/SimplyForm.vue'
+// import SimplyForm from './components/Form/SimplyForm.vue'
+import Home from './views/Home/Home.vue'
+import Login from './views/Login/Login.vue'
 
 // const testData: ColumnProps[] = [
 //   {
@@ -62,7 +66,9 @@ export default defineComponent({
   components: {
     // ColumnList,
     GlobalHeader,
-    SimplyForm
+    // SimplyForm,
+    // Home,
+    Login
   },
   setup () {
     return {
