@@ -8,7 +8,9 @@ interface UserProps {
   /** 名称 */
   name?: string,
   /** id */
-  id?: number
+  id?: number,
+  /** 专栏Id */
+  columnId?: number;
 }
 
 export interface GlobalDataProps {
@@ -20,7 +22,7 @@ const store = createStore<GlobalDataProps>({
   state: {
     columns: testData,
     posts: testPosts,
-    user: { isLogin: false }
+    user: { isLogin: false, columnId: 1 }
   },
   // 可以认为是store中的计算属性, getters的返回值会根据的它的依赖项缓存起来
   // 定义完毕，就可以在应用中使用这个 getter 了
@@ -33,6 +35,14 @@ const store = createStore<GlobalDataProps>({
   mutations: {
     login (state) {
       state.user = { ...state.user, isLogin: true, name: 'hcy' }
+    },
+    /**
+     * 新建文章
+     * @param state
+     * @param newPost 文章详情
+     */
+    createPost (state, newPost) {
+      state.posts.push(newPost)
     }
   }
 })
