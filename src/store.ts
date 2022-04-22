@@ -22,6 +22,14 @@ const store = createStore<GlobalDataProps>({
     posts: testPosts,
     user: { isLogin: false }
   },
+  // 可以认为是store中的计算属性, getters的返回值会根据的它的依赖项缓存起来
+  // 定义完毕，就可以在应用中使用这个 getter 了
+  // Getter 会暴露为 store.getters 对象，你可以以属性的形式访问这些值：
+  getters: {
+    biggerColumnsLen (state) {
+      return state.columns.filter(c => c.id > 2).length
+    }
+  },
   mutations: {
     login (state) {
       state.user = { ...state.user, isLogin: true, name: 'hcy' }
