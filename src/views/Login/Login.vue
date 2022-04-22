@@ -28,6 +28,7 @@ import { defineComponent, ref } from 'vue'
 import ValidateInput, { RulesProp } from '../../components/Form/ValidtateInput.vue'
 import ValidateForm from '../../components/Form/ValidateForm.vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
 export default defineComponent({
   name: 'Login',
@@ -36,6 +37,7 @@ export default defineComponent({
     ValidateForm
   },
   setup () {
+    const store = useStore()
     const router = useRouter()
     const emailVal = ref('')
     const emailRules: RulesProp = [
@@ -49,6 +51,8 @@ export default defineComponent({
     const onFormSubmit = (result: boolean) => {
       console.log('result', result)
       if (result) {
+        // 登录成功,修改仓库的登录信息
+        store.commit('login')
         router.push('/')
       }
     }

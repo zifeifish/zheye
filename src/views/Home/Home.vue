@@ -17,17 +17,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { testData } from '../../testData'
+import { defineComponent, computed } from 'vue'
 import ColumnList from '../../components/ColumnList.vue'
+// 引入useStore
+import { useStore } from 'vuex'
+import { GlobalDataProps } from '@/store'
 export default defineComponent({
   name: 'Home',
   components: {
     ColumnList
   },
   setup () {
+    // 传入定义好的类型 GlobalDataProps
+    const store = useStore<GlobalDataProps>()
+    const list = computed(() => store.state.columns)
     return {
-      list: testData
+      list
     }
   }
 })
