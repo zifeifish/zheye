@@ -3,6 +3,7 @@ import Home from './views/Home/Home.vue'
 import Login from './views/Login/Login.vue'
 import ColumnDetail from './views/Column/ColumnDetail.vue'
 import CreatePost from './views/CreatePost.vue'
+import store from './store'
 
 const routerHistory = createWebHistory()
 const router = createRouter({
@@ -33,6 +34,15 @@ const router = createRouter({
       component: CreatePost
     }
   ]
+})
+
+/** 路由前置守卫 */
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'login' && !store.state.user.isLogin) {
+    next({ name: 'login' })
+  } else {
+    next(true)
+  }
 })
 
 export default router
