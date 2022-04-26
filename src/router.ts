@@ -40,6 +40,7 @@ const router = createRouter({
   ]
 })
 
+// icode = 68A64E449EB8FAAC
 /** 路由前置守卫 */
 router.beforeEach((to, from, next) => {
   const isLogin = store.state.user.isLogin
