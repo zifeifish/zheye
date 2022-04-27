@@ -78,3 +78,60 @@ export function bubbleSort3 (arry: number[]): number[] {
   }
   return arry
 }
+
+/** 双循环数组去重, 发现重复元素删除 */
+export function noRepeat1 (arr: number[]): number[] {
+  for (let i = 0; i < arr.length - 1; i++) {
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[i] === arr[j]) {
+        arr.splice(i, 1)
+        j--
+      }
+    }
+  }
+  return arr
+}
+
+/** 循环数组, 利用对象属性不能重复原理,将数组的每项作为对象属性,查询对象属性的值,没有就加进数组中去  */
+export function noRepeat2 (arr: any[]): any[] {
+  const obj = {} as any
+  const newArr = [] as any
+  for (let i = 0; i < arr.length; i++) {
+    if (obj[arr[i]] === undefined) {
+      newArr.push(i)
+      obj[arr[i]] = 1
+    } else {
+      obj[arr[i]]++
+    }
+  }
+  return newArr
+}
+
+/** 循环数组, 利用数组的includes()属性检测数组元素，没有就加进数组中去 */
+export function noRepeat3 (arr: number[]): number[] {
+  const newArr: number[] = []
+  for (let i = 0; i < arr.length; i++) {
+    if (!newArr.includes(arr[i])) {
+      newArr.push(arr[i])
+    }
+  }
+  return newArr
+}
+
+/** 循环数组, 利用数组的indexOf()属性检测数组元素的是否在新数组中，没有就加进数组中去 */
+export function noRepeat4 (arr: number[]): number[] {
+  const newArr: number[] = []
+  for (let i = 0; i < arr.length; i++) {
+    if (newArr.indexOf(arr[i]) === -1) {
+      newArr.push(arr[i])
+    }
+  }
+  return newArr
+}
+
+/** 循环数组, 利用数组的filter和indexOf()属性检测当前元素在的数组的位置和当前的下标是否一致，
+ * 没有就加进数组中去
+ * */
+export function noRepeat5 (arr: number[]): number[] {
+  return arr.filter((item, index, self) => self.indexOf(item) === index)
+}
