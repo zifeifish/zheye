@@ -1,6 +1,6 @@
 /** 数组元素未被排过序 */
 export function bubbleSort1 (arry: number[]): number[] {
-  for (let i = 0; i <= arry.length - 1; i++) { // 排序比较的轮数 n-1次
+  for (let i = 0; i < arry.length - 1; i++) { // 排序比较的轮数 n-1次
     for (let j = 0; j < arry.length - 1 - i; j++) { // 两两比较的元素范围
       if (arry[j] > arry[j + 1]) {
         const temp = arry[j]
@@ -21,7 +21,7 @@ export function bubbleSort2 (arry: number[]): number[] {
   if (arry.length < 2 || !arry) {
     return []
   }
-  for (let i = 0; i <= arry.length - 1; i++) { // 排序比较的轮数 n-1次
+  for (let i = 0; i < arry.length - 1; i++) { // 排序比较的轮数 n-1次
     // 有序标识,每轮比较开始前先默认有序
     let isSorted = true
     for (let j = 0; j < arry.length - 1 - i; j++) { // 两两比较的元素范围
@@ -56,7 +56,7 @@ export function bubbleSort3 (arry: number[]): number[] {
   let lastExchangeIndex = 0
   // 无需元素比较的边界,每次比较到这里就可以了
   let sortBorder = arry.length - 1
-  for (let i = 0; i <= arry.length - 1; i++) { // 排序比较的轮数 n-1次
+  for (let i = 0; i < arry.length - 1; i++) { // 排序比较的轮数 n-1次
     // 有序标识,每轮比较开始前先默认有序
     let isSorted = true
     for (let j = 0; j < sortBorder; j++) { // 两两比较的元素范围
@@ -134,4 +134,26 @@ export function noRepeat4 (arr: number[]): number[] {
  * */
 export function noRepeat5 (arr: number[]): number[] {
   return arr.filter((item, index, self) => self.indexOf(item) === index)
+}
+
+/** es6中的Set去重,Set数据的成员值都是唯一的, {}无法去重 */
+export function noRepeat6 (arr: number[]): number[] {
+  return Array.from(new Set(arr))
+}
+
+/** 数组sort()排序后,再遍历数据两两元素比较, NaN、{} 无法去重 */
+export function noRepeat7 (arr: number[]): number[] {
+  const newArr = [arr[0]]
+  arr.sort()
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] !== arr[i - 1]) {
+      newArr.push(arr[i])
+    }
+  }
+  return newArr
+}
+
+/** reduce()去重 */
+export function noRepeat8 (arr: number[]): number[] {
+  return arr.reduce((prev, curr) => prev.includes(curr) ? prev : prev.concat(curr), [arr[0]])
 }
