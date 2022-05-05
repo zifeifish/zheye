@@ -27,8 +27,8 @@
 import { defineComponent, ref } from 'vue'
 import ValidateInput, { RulesProp } from '../../components/Form/ValidtateInput.vue'
 import ValidateForm from '../../components/Form/ValidateForm.vue'
-import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import createMessage from '@/components/Message/createMessage'
 
 export default defineComponent({
   name: 'Login',
@@ -38,7 +38,6 @@ export default defineComponent({
   },
   setup () {
     const store = useStore()
-    const router = useRouter()
     const emailVal = ref('')
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
@@ -53,7 +52,10 @@ export default defineComponent({
       if (result) {
         // 登录成功,修改仓库的登录信息
         store.commit('login')
-        router.push('/')
+        createMessage('登录成功', 'success')
+        // router.push('/')
+      } else {
+        createMessage('登录失败', 'error', 5000)
       }
     }
     return {
