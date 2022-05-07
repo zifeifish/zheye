@@ -16,7 +16,6 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import axios from 'axios'
-import createMessage from '@/components/Message/createMessage'
 type UploadStatus = 'ready' | 'loading' | 'success' | 'error'
 export default defineComponent({
   name: 'Uploader',
@@ -49,14 +48,11 @@ export default defineComponent({
           console.log(resp.data)
           if (resp.data.code === 0) {
             fileStatus.value = 'success'
-            createMessage(`${resp.data.msg}`, 'success')
           } else {
             fileStatus.value = 'error'
-            createMessage(`${resp.data.msg}`, 'error')
           }
-        }).catch((err) => {
+        }).catch(() => {
           fileStatus.value = 'error'
-          createMessage(`${err}`, 'error')
         }).finally(() => {
           if (fileInput.value) {
             fileInput.value.value = ''
