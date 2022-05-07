@@ -22,9 +22,7 @@ axios.interceptors.response.use(response => {
     createMessage(`${response.data.msg}`, 'error')
   }
   console.log(666, response)
-  // setTimeout(() => {
   store.commit('setLoading', false)
-  // }, 1000)
   return response
 }, e => {
   const { error } = e.response.data
