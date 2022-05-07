@@ -1,5 +1,6 @@
 <template>
   <div class="login-page">
+    <uploader></uploader>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
@@ -29,12 +30,14 @@ import ValidateInput, { RulesProp } from '../../components/Form/ValidtateInput.v
 import ValidateForm from '../../components/Form/ValidateForm.vue'
 import { useStore } from 'vuex'
 import createMessage from '@/components/Message/createMessage'
+import Uploader from '../../components/Uploader.vue'
 
 export default defineComponent({
   name: 'Login',
   components: {
     ValidateInput,
-    ValidateForm
+    ValidateForm,
+    Uploader
   },
   setup () {
     const store = useStore()
