@@ -7,9 +7,18 @@ import axios from 'axios'
 import createMessage from '@/components/Message/createMessage'
 
 const icode = '68A64E449EB8FAAC'
-axios.defaults.baseURL = 'http://apis.imooc.com/api'
+axios.defaults.baseURL = 'http://apis.imooc.com/api/'
 axios.interceptors.request.use(config => {
+  // get请求,icode携带在url中
   config.params = { ...config.params, icode }
+  // 其他请求
+  if (config.data instanceof FormData) {
+    // 上传文件data是FormData格式
+    config.data.append('icode', icode)
+  } else {
+    // 普通body对象
+    config.data = { ...config.data, icode }
+  }
   store.commit('setLoading', true)
   store.commit('setError', { status: false, message: '' })
   return config
