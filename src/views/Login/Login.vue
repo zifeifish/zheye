@@ -1,11 +1,7 @@
 <template>
-  <div class="login-page">
-    <uploader action="/upload">
-      <template #uploaded="dataProps">
-        <img :src="dataProps.uploadedData.data.url" width="500" />
-      </template>
-    </uploader>
-    <validate-form @form-submit="onFormSubmit">
+  <div class="login-page mx-auto p-3 w-330">
+    <h5 class="my-4 text-center">登录到者也</h5>
+    <validate-form @form-submit="onFormSubmit" ref="loginForm">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
         <validate-input
@@ -23,29 +19,37 @@
           :rules="passwordRules"
           v-model="passwordVal"
         />
+        <div class="form-text">
+          <router-link to="/signup">还没有账户？去注册一个新的吧！</router-link>
+        </div>
       </div>
+      <template #submit>
+        <button type="submit" class="btn btn-primary btn-block btn-large">登录</button>
+      </template>
     </validate-form>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import ValidateInput, { RulesProp } from '@/components/Form/ValidtateInput.vue'
 import ValidateForm from '@/components/Form/ValidateForm.vue'
-import { useStore } from 'vuex'
 import createMessage from '@/components/Message/createMessage'
-import Uploader from '@/components/Uploader.vue'
+import { testData } from '@/testData'
 
 export default defineComponent({
   name: 'Login',
   components: {
     ValidateInput,
-    ValidateForm,
-    Uploader
+    ValidateForm
   },
   setup () {
-    const store = useStore()
     const emailVal = ref('')
+    const loginForm = ref()
+    const router = useRouter()
+    const store = useStore()
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
       { type: 'email', message: '请输入正确的电子邮箱格式' }
@@ -55,14 +59,22 @@ export default defineComponent({
       { type: 'required', message: '密码不能为空' }
     ]
     const onFormSubmit = (result: boolean) => {
-      console.log('result', result)
       if (result) {
-        // 登录成功,修改仓库的登录信息
-        store.commit('login')
-        createMessage('登录成功', 'success')
-        // router.push('/')
+        const payload = {
+          email: emailVal.value,
+          password: passwordVal.value
+        }
+        store.dispatch('loginAndFetch', payload).then(data => {
+          createMessage('登录成功 2秒后跳转首页', 'success', 2000)
+          setTimeout(() => {
+            router.push('/')
+          }, 2000)
+        }).catch(e => {
+          console.log(e)
+        })
       } else {
-        createMessage('登录失败', 'error', 5000)
+        // hcy@testData.com 123456
+        loginForm.value.clearInputs()
       }
     }
     return {
@@ -70,7 +82,8 @@ export default defineComponent({
       emailVal,
       passwordVal,
       passwordRules,
-      onFormSubmit
+      onFormSubmit,
+      loginForm
     }
   }
 })
