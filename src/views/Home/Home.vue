@@ -1,44 +1,66 @@
 <template>
-  <div class="home-page">
-    <section class="py-5 text-center container">
+  <div class="home-page container-md">
+    <section class="text-center container">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
-          <img src="../../assets/callout.svg" alt="callout" class="w-50" />
+          <img src="../../assets/callout.svg" alt="callout" class="w-50"/>
           <h2 class="font-weight-light">随心写作，自由表达</h2>
           <p>
-            <a href="#" class="btn btn-primary my-2">开始写文章</a>
+            <a href="#" class="btn btn-primary my-2" @click.prevent="createOrLogin">开始写文章</a>
           </p>
         </div>
       </div>
     </section>
-    <h4 class="font-weight-bold text-center">发现精彩</h4>
+    <h4 class="font-weight-bold text-center mb-4">发现精彩</h4>
     <column-list :list="list"></column-list>
+    <button
+      class="btn btn-outline-primary mt-2 mb-5 mx-auto btn-block w-25 d-block"
+       @click="loadMorePage" v-if="!isLastPage"
+    >
+      加载更多
+    </button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
-import ColumnList from '../../components/ColumnList.vue'
-// 引入useStore
+import { defineComponent, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { GlobalDataProps } from '@/store'
+import { useRouter } from 'vue-router'
+import { GlobalDataProps } from '../../store'
+import ColumnList from '../../components/ColumnList.vue'
+import { objToArr } from '../../utils/index'
+import useLoadMore from '../../hooks/useLoadMore'
+
 export default defineComponent({
   name: 'Home',
   components: {
     ColumnList
   },
   setup () {
-    // 传入定义好的类型 GlobalDataProps
     const store = useStore<GlobalDataProps>()
-    const list = computed(() => store.state.columns)
+    const router = useRouter()
+    const totalColumns = computed(() => store.state.columns.total || 0)
+    const currentPage = computed(() => store.state.columns.currentPage || 0)
+    onMounted(() => {
+      store.dispatch('fetchColumns')
+    })
+    const list = computed(() => objToArr(store.state.columns.data))
+    const { loadMorePage, isLastPage } = useLoadMore('fetchColumns', totalColumns, { currentPage: currentPage.value }, 6)
 
-    // 定义完毕，就可以在应用中使用这个 getter 了
-    // Getter 会暴露为 store.getters 对象，你可以以属性的形式访问这些值：
-    const biggerColumnsLen = computed(() => store.getters.biggerColumnsLen)
-
+    const createOrLogin = () => {
+      const isLogin = store.state.user.isLogin
+      if (!isLogin) {
+        router.push('/login')
+      } else {
+        router.push('/create')
+      }
+    }
     return {
       list,
-      biggerColumnsLen
+      loadMorePage,
+      isLastPage,
+      totalColumns,
+      createOrLogin
     }
   }
 })
