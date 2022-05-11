@@ -30,11 +30,11 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import ValidateInput, { RulesProp } from '../../components/Form/ValidtateInput.vue'
-import ValidateForm from '../../components/Form/ValidateForm.vue'
+import ValidateInput, { RulesProp } from '@/components/Form/ValidtateInput.vue'
+import ValidateForm from '@/components/Form/ValidateForm.vue'
 import { useStore } from 'vuex'
 import createMessage from '@/components/Message/createMessage'
-import Uploader from '../../components/Uploader.vue'
+import Uploader from '@/components/Uploader.vue'
 
 export default defineComponent({
   name: 'Login',

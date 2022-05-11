@@ -1,43 +1,42 @@
 <template>
-  <div class="validate-input-container pb-3">
+  <div class="validate-input-container pb-3 position-relative">
     <input
       v-if="tag !== 'textarea'"
-      type="text"
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
-      :value="inputRef.val"
+      v-model="inputVal"
       @blur="validateInput"
-      @input="updateValue"
       v-bind="$attrs"
     >
     <textarea
       v-else
       class="form-control"
       :class="{'is-invalid': inputRef.error}"
+      v-model="inputVal"
       @blur="validateInput"
-      v-model="inputRef.val"
       v-bind="$attrs"
     >
     </textarea>
-    <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
+    <span v-if="inputRef.error" class="invalid-feedback position-absolute mt-1">{{inputRef.message}}</span>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, PropType, onMounted } from 'vue'
-import { InputEmitter } from './ValidateForm.vue'
-const emailReg = new RegExp(/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
+import { defineComponent, reactive, PropType, onMounted, computed, inject } from 'vue'
+import { emitter } from './ValidateForm.vue'
+const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 interface RuleProp {
-  type: 'required' | 'email';
-  message: string;
+  type: 'required' | 'email' | 'custom' | 'range';
+  message?: string;
+  validator?: () => boolean;
+  min?: {length: number; message: string };
+  max?: {length: number; message: string };
 }
 export type RulesProp = RuleProp[]
 export type TagType = 'input' | 'textarea'
 export default defineComponent({
-  name: 'ValidtateInput',
   props: {
     rules: Array as PropType<RulesProp>,
-    // 一、props中创建modelValue属性
     modelValue: String,
     tag: {
       type: String as PropType<TagType>,
@@ -46,30 +45,46 @@ export default defineComponent({
   },
   inheritAttrs: false,
   setup (props, context) {
-    console.log(context.attrs)
-
+    const inputVal = computed({
+      get: () => props.modelValue || '',
+      set: val => {
+        context.emit('update:modelValue', val)
+      }
+    })
     const inputRef = reactive({
-      val: props.modelValue || '',
       error: false,
       message: ''
     })
-    const updateValue = (e: Event) => {
-      const targetValue = (e.target as HTMLInputElement).value
-      inputRef.val = targetValue
-      // 二、更新值的时候需要发射事件出去 事件名：'update:modelValue'
-      context.emit('update:modelValue', inputRef.val)
+    const clearInput = () => {
+      inputVal.value = ''
     }
     const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(rule => {
           let passed = true
-          inputRef.message = rule.message
+          inputRef.message = rule.message || ''
+          const { value } = inputVal
           switch (rule.type) {
             case 'required':
-              passed = (inputRef.val.trim() !== '')
+              passed = (value.trim() !== '')
               break
             case 'email':
-              passed = emailReg.test(inputRef.val)
+              passed = emailReg.test(value)
+              break
+            case 'range': {
+              const { min, max } = rule
+              if (min && value.trim().length < min.length) {
+                passed = false
+                inputRef.message = min.message
+              }
+              if (max && value.trim().length > max.length) {
+                passed = false
+                inputRef.message = max.message
+              }
+              break
+            }
+            case 'custom':
+              passed = rule.validator ? rule.validator() : true
               break
             default:
               break
@@ -81,16 +96,25 @@ export default defineComponent({
       }
       return true
     }
-
     onMounted(() => {
-      // 把事件发射出去
-      InputEmitter.emit('form-item-created', validateInput)
+      emitter.emit('form-item-created', {
+        validator: validateInput,
+        clearInput,
+        formName: inject('formName')
+      })
     })
     return {
       inputRef,
       validateInput,
-      updateValue
+      inputVal
     }
   }
 })
 </script>
+
+<style>
+
+.validate-input-container .error-message {
+  bottom: -5px;
+}
+</style>

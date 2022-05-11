@@ -4,6 +4,7 @@ import Login from './views/Login/Login.vue'
 import ColumnDetail from './views/Column/ColumnDetail.vue'
 import CreatePost from './views/CreatePost.vue'
 import store from './store'
+import SignUp from './views/SignUp/SignUp.vue'
 
 const routerHistory = createWebHistory()
 const router = createRouter({
@@ -36,6 +37,12 @@ const router = createRouter({
       component: CreatePost,
       // 添加路由元信息, 判断是否需要登录
       meta: { requiredLogin: true }
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignUp,
+      meta: { redirectAlreadyLogin: true }
     }
   ]
 })

@@ -10,41 +10,56 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, onUnmounted, provide } from 'vue'
 import mitt from 'mitt'
-import { defineComponent, onUnmounted } from 'vue'
+type ValidateFunc = () => boolean;
+type ClearFunc = () => void;
 // 定义发射函数的类型
-type Func = () => boolean
+interface CallbackProps {
+  validator: ValidateFunc;
+  clearInput: ClearFunc;
+  formName: string | undefined;
+}
 // mitt3.0.0 定义一个events 类型, 这个定义是为了让事件与callback对应
 type Events = {
-  'form-item-created': Func
+  'form-item-created': CallbackProps
 }
-// 创建一个实例化的mitt 将event作为泛型传入
-export const InputEmitter = mitt<Events>()
+export const emitter = mitt<Events>()
 export default defineComponent({
-  name: 'ValidateForm',
   emits: ['form-submit'],
+  props: {
+    // 请提供不同的 formName 当使用多个表单在同一个页面中的时候
+    name: {
+      type: String,
+      default: 'default'
+    }
+  },
   setup (props, context) {
+    provide('formName', props.name)
+    let funcArr: ValidateFunc[] = []
+    let clearArr: ClearFunc[] = []
     const submitForm = () => {
-      // 执行事件集合的全部校验函数
-      const result = funcArr.map(func => func()).every(valid => valid)
+      const result = funcArr.map((func) => func()).every((result) => result)
       context.emit('form-submit', result)
     }
-    // 子组件发射出来的的事件集合
-    const funcArr: Func[] = []
-    // 监听回调
-    const callback = (func: Func) => {
-      funcArr.push(func)
+    const callback = (obj?: CallbackProps) => {
+      if (obj && obj.formName === props.name) {
+        funcArr.push(obj.validator)
+        clearArr.push(obj.clearInput)
+      }
     }
-    // 添加监听
-    // InputEmitter.on('form-item-created', test => console.log('off mitt', test))
-    InputEmitter.on('form-item-created', callback)
-
+    const clearInputs = () => {
+      clearArr.forEach((clear) => clear())
+    }
+    emitter.on('form-item-created', callback)
     onUnmounted(() => {
-      // 删除监听
-      InputEmitter.off('form-item-created', test => console.log('off mitt', test))
+      emitter.off('form-item-created', callback)
+      funcArr = []
+      clearArr = []
     })
     return {
-      submitForm
+      submitForm,
+      clearInputs
     }
   }
 })
