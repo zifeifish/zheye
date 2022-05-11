@@ -1,23 +1,33 @@
 <template>
   <div class="file-upload">
-    <button class="btn btn-primary" @click.prevent="triggerUpload">
-      <span v-if="fileStatus === 'loading'">正在上传...</span>
-      <span v-else-if="fileStatus === 'success'">上传成功</span>
-      <span v-else>点击上传</span>
-    </button>
+    <div class="file-upload-container" @click.prevent="triggerUpload">
+      <slot v-if="fileStatus === 'loading'" name="loading">
+        <button class="btn btn-primary" disabled>正在上传...</button>
+      </slot>
+      <slot
+        v-else-if="fileStatus === 'success'"
+        name="uploaded"
+        :uploadedData="uploadedData"
+      >
+        <button class="btn btn-primary">上传成功</button>
+      </slot>
+      <slot v-else name="default">
+        <button class="btn btn-primary">点击上传</button>
+      </slot>
+    </div>
     <input
       type="file"
       class="file-input d-none"
       ref="fileInput"
       @change="handleFileChange"
-    >
+    />
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue'
 import axios from 'axios'
-type UploadStatus = 'ready' | 'loading' | 'success' | 'error'
-type CheckFunction = (file: File) => boolean
+type UploadStatus = 'ready' | 'loading' | 'success' | 'error';
+type CheckFunction = (file: File) => boolean;
 export default defineComponent({
   name: 'Uploader',
   props: {
@@ -33,6 +43,7 @@ export default defineComponent({
   setup (props, context) {
     const fileInput = ref<null | HTMLInputElement>(null)
     const fileStatus = ref<UploadStatus>('ready')
+    const uploadedData = ref()
     const triggerUpload = () => {
       if (fileInput.value) {
         fileInput.value.click()
@@ -51,34 +62,40 @@ export default defineComponent({
         fileStatus.value = 'loading'
         const formData = new FormData()
         formData.append('file', files[0])
-        axios.post(`${props.action}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then(resp => {
-          console.log(resp.data)
-          if (resp.data.code === 0) {
-            fileStatus.value = 'success'
-            context.emit('file-uploaded', resp.data)
-          } else {
+        axios
+          .post(`${props.action}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then((resp) => {
+            console.log(resp.data)
+            if (resp.data.code === 0) {
+              fileStatus.value = 'success'
+              uploadedData.value = resp.data
+              context.emit('file-uploaded', resp.data)
+            } else {
+              fileStatus.value = 'error'
+              context.emit('file-upload-error', resp)
+            }
+          })
+          .catch((error) => {
             fileStatus.value = 'error'
-            context.emit('file-upload-error', resp)
-          }
-        }).catch((error) => {
-          fileStatus.value = 'error'
-          context.emit('file-upload-error', error)
-        }).finally(() => {
-          if (fileInput.value) {
-            fileInput.value.value = ''
-          }
-        })
+            context.emit('file-upload-error', error)
+          })
+          .finally(() => {
+            if (fileInput.value) {
+              fileInput.value.value = ''
+            }
+          })
       }
     }
     return {
       fileInput,
       triggerUpload,
       fileStatus,
-      handleFileChange
+      handleFileChange,
+      uploadedData
     }
   }
 })
