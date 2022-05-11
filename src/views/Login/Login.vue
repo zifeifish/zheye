@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <uploader></uploader>
+    <uploader action="/upload"></uploader>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">邮箱地址</label>
